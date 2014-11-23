@@ -23,6 +23,15 @@ public class AsyncHttpClientImdbAsyncServiceTest {
     }
 
     @Test
+    public void workaroundForEmptySearchResultsWorks() throws Exception {
+        for (int i=0; i<10; i++) {
+            final List<ImdbSearchResult> results = service.search("Агнозия / Agnosia 2010").get(5, TimeUnit.SECONDS);
+            assertThat(results.size(), greaterThan(1));
+            assertThat(results.get(0).getName(), equalTo("Agnosia"));
+        }
+    }
+
+    @Test
     public void detailsReturnsResults() throws Exception {
         final ImdbDetails imdbDetails = service.details("/title/tt0362269").get(5, TimeUnit.SECONDS);
 

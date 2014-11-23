@@ -39,7 +39,7 @@ public class MakeReport {
                     query = line;
                 } else {
                     year = (matcher.group(2) == null ? "" : matcher.group(2));
-                    query = matcher.group(1) + " " + year;
+                    query = matcher.group(1).replaceAll("[()]", "") + " (" + year + ")";
                 }
 
                 final Integer expectedYear;
