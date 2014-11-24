@@ -1,6 +1,7 @@
 package ru.alepar.services.imdb;
 
 import org.junit.Test;
+import ru.alepar.TestSupport;
 
 import java.util.List;
 

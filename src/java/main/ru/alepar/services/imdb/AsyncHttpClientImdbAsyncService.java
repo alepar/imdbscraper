@@ -7,6 +7,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import com.ning.http.client.Response;
 import ru.alepar.http.client.AsyncHttpClient;
+import ru.alepar.http.client.ning.GetResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -91,15 +92,4 @@ class AsyncHttpClientImdbAsyncService implements ImdbAsyncService {
         }
     }
 
-    private static class GetResponseBody implements Function<Response, String> {
-
-        @Override
-        public String apply(Response input) {
-            try {
-                return input.getResponseBody();
-            } catch (Exception e) {
-                throw new RuntimeException("failed to get response body", e);
-            }
-        }
-    }
 }

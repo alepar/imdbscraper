@@ -17,40 +17,26 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MakeReport {
-
-    public static final Pattern cleanupPattern = Pattern.compile("([^;]+).*(\\d{4}).*");
+public class MakeReport2 {
 
     public static void main(String[] args) throws Exception{
         try (
                 NingAsyncHttpClient client = new NingAsyncHttpClient();
-                BufferedReader reader = loadResourceAsString("ru/alepar/psycho.txt")
+                BufferedReader reader = loadResourceAsString("ru/alepar/imdbmiss2.txt")
         ) {
             final ImdbAsyncService imdb = ImdbAsyncService.Factory.create(client);
             final List<ListenableFuture<?>> futures = new ArrayList<>();
 
             String line;
             while ((line = reader.readLine()) != null) {
-                final Matcher matcher = cleanupPattern.matcher(line);
 
-                final String query;
-                String year = null;
-                if (!matcher.find()) {
-                    query = line;
-                } else {
-                    year = (matcher.group(2) == null ? "" : matcher.group(2));
-                    query = matcher.group(1).replaceAll("[()]", "") + " (" + year + ")";
+                final String[] split = line.split("\t");
+                final String url = split[0];
+                if("-".equals(url.trim())) {
+                    continue;
                 }
 
-                final Integer expectedYear;
-                if (year != null && !year.isEmpty()) {
-                    expectedYear = Integer.valueOf(year);
-                } else {
-                    expectedYear = null;
-                }
-
-                final ListenableFuture<List<ImdbSearchResult>> searchFuture = imdb.search(query);
-                final ListenableFuture<ImdbDetails> detailFuture = Futures.transform(searchFuture, new FindMatchAndQueryDetails(imdb, expectedYear));
+                final ListenableFuture<ImdbDetails> detailFuture = imdb.details(url);
                 Futures.addCallback(detailFuture, new PrintOutResult(line));
 
                 futures.add(detailFuture);
@@ -61,30 +47,6 @@ public class MakeReport {
                     future.get(); // let everyone finish
                 } catch (Exception ignored) { }
             }
-        }
-    }
-
-    private static class FindMatchAndQueryDetails implements AsyncFunction<List<ImdbSearchResult>, ImdbDetails> {
-        private final ImdbAsyncService imdb;
-        private final Integer expectedYear;
-
-        public FindMatchAndQueryDetails(ImdbAsyncService imdb, Integer expectedYear) {
-            this.imdb = imdb;
-            this.expectedYear = expectedYear;
-        }
-
-        @Override
-        public ListenableFuture<ImdbDetails> apply(List<ImdbSearchResult> input) {
-            if (input == null || input.isEmpty()) {
-                throw new RuntimeException("search returned no results");
-            }
-
-            final ImdbSearchResult searchResult = input.get(0);
-            if(expectedYear != null && Math.abs(expectedYear - searchResult.getYear()) > 2) {
-                throw new RuntimeException("year is too far off");
-            }
-
-            return imdb.details(searchResult.getUrl());
         }
     }
 

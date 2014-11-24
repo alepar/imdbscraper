@@ -1,6 +1,7 @@
 package ru.alepar.services.imdb;
 
 import org.junit.Test;
+import ru.alepar.TestSupport;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;

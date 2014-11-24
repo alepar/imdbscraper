@@ -1,4 +1,4 @@
-package ru.alepar.services.imdb;
+package ru.alepar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class TestSupport {
-    static String loadResourceAsString(String url) {
+    public static String loadResourceAsString(String url) {
         final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(url);
         if (is == null) {
             throw new RuntimeException("resource not found: " + url);
